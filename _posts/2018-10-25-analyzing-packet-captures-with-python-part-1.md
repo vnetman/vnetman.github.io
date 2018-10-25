@@ -2,21 +2,21 @@
 layout: post
 title:  "Analyzing Packet Captures with Python"
 tagline: "Part 1: The Basics"
-date:   2018-09-24 18:57:03 +0530
+date:   2018-10-25 19:54:03 +0530
 categories: pcap python pyshark scapy libpcap
 ---
 
-### What we're trying to achieve
+### Why would you use Python to read a pcap?
 
 For most situations involving analysis of packet captures, Wireshark is the tool of choice. And for good reason too - Wireshark provides an excellent GUI that not only displays the contents of individual packets, but also analysis and statistics tools that allow you to, for example, track individual TCP conversations within a pcap, and pull up related metrics. 
 
-There are situations, however, where the ability to process a PCAP *programmatically* becomes extremely useful. Consider:
+There are situations, however, where the ability to process a pcap *programmatically* becomes extremely useful. Consider:
 
-- given a PCAP that contains hundreds of thousands of packets, find the first connection to a particular server/service where the TCP SYN-ACK took more than 300ms to appear after the initial SYN
+- given a pcap that contains hundreds of thousands of packets, find the first connection to a particular server/service where the TCP SYN-ACK took more than 300ms to appear after the initial SYN
 
-- in a PCAP that captures thousands of TCP connections between a client and several servers, find the connections that were prematurely terminated because of a RST sent by the client; at that point in time, determine how many other connections were in progress between that client and *other* servers
+- in a pcap that captures thousands of TCP connections between a client and several servers, find the connections that were prematurely terminated because of a RST sent by the client; at that point in time, determine how many other connections were in progress between that client and *other* servers
 
-- you are given *two* PCAPs, one gathered on a SPAN port on an access switch, and another on an application server a few L3 hops away. At some point the application server sporadically becomes slow (retransmits on both sides, TCP windows shrinking etc.). Prove that it is (or is not) because of the network.
+- you are given *two* pcaps, one gathered on a SPAN port on an access switch, and another on an application server a few L3 hops away. At some point the application server sporadically becomes slow (retransmits on both sides, TCP windows shrinking etc.). Prove that it is (or is not) because of the network.
 
 - repeat the above exercises several times a week (or several times a day) with different sets of packet captures
 
@@ -32,7 +32,7 @@ I will be using Python (3). Why Python? Apart from the well-known benefits of Py
 
 ### What modules?
 
-I will be using scapy, plus a few other modules that are not specific to packet processing or networking (argparse, pickle, pandas (in a later blog post)).
+I will be using scapy, plus a few other modules that are not specific to packet processing or networking (argparse, pickle, pandas).
 
 Note that there are other alternative Python modules that can be used to read and parse pcap files, like pyshark and pycapfile. Pyshark in particular is interesting because it simply leverages the underlying tshark installed on the system to do its work, so if you are in a situation where you need to leverage tshark's powerful protocol decoding ability, pyshark is the way to go. In this blog however I am restricting myself to regular Ethernet/IPv4/TCP packets, and I can just use scapy.
 
@@ -40,15 +40,15 @@ Note that there are other alternative Python modules that can be used to read an
 
 #### A few notes before we start
 
-The code below was written and executed on Linux (Linux Mint 18.3), but the code is OS-agnostic; it should work as well in other environments, with little or no modification.
+The code below was written and executed on Linux (Linux Mint 18.3 64-bit), but the code is OS-agnostic; it should work as well in other environments, with little or no modification.
 
-In this post I use an [example PCAP file]( https://github.com/vnetman/pcap-files/raw/master/example-01.pcap) captured on my computer.
+In this post I use an [example pcap file]( https://github.com/vnetman/pcap-files/raw/master/example-01.pcap) captured on my computer.
 
 #### Step 1: Program skeleton
 
 Build a skeleton for the program. This will also serve to check if your Python installation is OK.
 
-Use the `argparse` module to get the PCAP file name from the command line. If your argparse knowledge needs a little brushing up, you can look at my [argparse recipe book](https://vnetman.github.io/vnetman-blog/argparse-recipes/2018/04/21/python-3-argparse-recipe-book.html), or at any other of the dozens of tutorials on the web.
+Use the `argparse` module to get the pcap file name from the command line. If your argparse knowledge needs a little brushing up, you can look at my [argparse recipe book](https://vnetman.github.io/vnetman-blog/argparse-recipes/2018/04/21/python-3-argparse-recipe-book.html), or at any other of the dozens of tutorials on the web.
 
 {% highlight python %}
 import argparse
@@ -80,11 +80,9 @@ Opening example-01.pcap...
 vnetman@vnetman-mint:> 
 ~~~~~~~~~~~~~~~
 
-Since there are no further changes in the argument parsing code, in the code samples below we'll just focus on changes to the `process_pcap` function.
+#### Step 2: Basic pcap handling
 
-#### Step 2: Basic PCAP handling
-
-Open the PCAP and count how many packets it contains.
+Open the pcap and count how many packets it contains.
 
 {% highlight python %}
 from scapy.utils import RawPcapReader
@@ -107,13 +105,13 @@ example-01.pcap contains 22639 packets
 vnetman@vnetman-mint:> 
 ~~~~~~~~~~~~~~~
 
-The `RawPcapReader` class is provided by the `scapy` module. This class is *iterable*, and in each iteration, it yields the data (i.e. packet contents) and metadata (i.e. timestamp, packet number etc.) for every packet in the capture.
+The `RawPcapReader` class is provided by the `scapy` module. This class is *iterable*, and in each iteration it yields the data (i.e. packet contents) and metadata (i.e. timestamp, packet number etc.) for every packet in the capture.
 
-At this point you may want to open the PCAP in Wireshark and verify if the packet count our program reports is consistent with that reported by Wireshark.
+At this point you may want to open the pcap in Wireshark and verify if the packet count our program reports is consistent with that reported by Wireshark.
 
-#### Step 3: Filter non TCP/IPv4 packets
+#### Step 3: Filter non IPv4/TCP packets
 
-Use scapy methods to filter out uninteresting packets. For starters, let us consider all /TCP/IPv4 packets as interesting.
+Use scapy methods to filter out uninteresting packets. For starters, let us consider all IPv4/TCP packets as interesting.
 
 {% highlight python %}
 from scapy.utils import RawPcapReader
@@ -523,9 +521,9 @@ def process_pcap(file_name):
 
 #### Step 7: Pickling
 
-If you've been executing the program in the previous steps, you will have noticed one thing: it is excruciatingly *slow*. This is because of scapy - for every one of the thousands of packets read from the capture file, our code builds scapy objects which, as it turns out, takes a while.
+If you've been executing the program in the previous steps, you will have noticed one thing: it is excruciatingly slow. This is because of scapy - for every one of the thousands of packets read from the capture file, our code builds scapy objects which, as it turns out, is an expensive and slow process.
 
-This is a serious issue because you are, after all, *developing* code: each time you run the program and examine its output, you will want to write *more* code to tweak something, or to gain some different insight. Each time you make a small change to the code and run it, you will have to deal with its slowness which can get frustrating and impede progress.
+This is a serious issue because you are, after all, *developing* code: each time you run the program and examine its output, you will want to write *more* code to tweak something, or to gain some different insight. Each time you make a small change to the code and run it, you will have to deal with its sluggishness which can get frustrating and impede progress.
 
 The most obvious way to deal with this problem is to not use scapy at all, and instead find an alternate faster method to look at the capture packet data and metadata.
 
@@ -548,7 +546,7 @@ The code below implements
 * a `pickle_pcap` function to read the given .pcap file and pickle the interesting data into a file
 * an `analyze_pickle` function to read the pickled data and print the *same* information as we did in Step 6; except, of course, that the data is now coming from the pickle file.
 
-The argparse code to parse the command line is not shown below; please look at my [argparse recipe book](https://vnetman.github.io/vnetman-blog/argparse-recipes/2018/04/21/python-3-argparse-recipe-book.html) if you need help.
+The argparse code to parse the command line is not shown below; please look at my [argparse recipe book](https://vnetman.github.io/vnetman-blog/argparse-recipes/2018/04/21/python-3-argparse-recipe-book.html) if you need help with using the argparse module.
 
 The pickle step runs like this:
 
@@ -813,167 +811,129 @@ def analyze_pickle(pickle_file_in):
 
 #### Step 8: Plotting the client window size
 
+The goal in this iteration of the code is to generate a graphical plot of the TCP Receive window on the Client. The end result is a graph that looks like this:
+
+![Analyzing Packet Captures with Python Part 1 Figure 1](/assets/0001.png)
+
+The code for generating the plot shown above, using pandas and matplotlib, is almost ridiculously easy (I am only showing the `analyze_pickle` function):
+
 {% highlight python %}
+import pandas as pd
+import matplotlib
+import matplotlib.pyplot as plt
+
+def analyze_pickle(pickle_file_in):
+
+    packets_for_analysis = []
+    
+    with open(pickle_file_in, 'rb') as pickle_fd:
+        client_ip_addr_port = pickle.load(pickle_fd)
+        server_ip_addr_port = pickle.load(pickle_fd)
+        packets_for_analysis = pickle.load(pickle_fd)
+
+    # Plot the receive window size on the client side.
+    client_pkts = []
+    for pkt_data in packets_for_analysis:
+        if pkt_data['direction'] == PktDirection.server_to_client:
+            continue
+
+        # Don't include the SYN packet
+        if 'S' in pkt_data['tcp_flags']:
+            continue
+
+        client_pkts.append({'Time': pkt_data['relative_timestamp'],
+                            'Client window size': pkt_data['window']})
+
+    df = pd.DataFrame(data=client_pkts)
+    df.plot(x='Time', y='Client window size', color='r')
+    plt.show()
+    plt.close()
+{% endhighlight %}
+
+You will notice from the graph that the window size shows a sudden dip to some value between 400000 and 500000 shortly after timestamp 21.1. If you find this suspicious, you can again write more code to help you narrow down the exact packet number in the capture:
+
+{% highlight python %}
+def analyze_pickle(pickle_file_in):
+
+    packets_for_analysis = []
+    
+    with open(pickle_file_in, 'rb') as pickle_fd:
+        client_ip_addr_port = pickle.load(pickle_fd)
+        server_ip_addr_port = pickle.load(pickle_fd)
+        packets_for_analysis = pickle.load(pickle_fd)
+
+    for pkt_data in packets_for_analysis:
+        if pkt_data['direction'] == PktDirection.server_to_client:
+            continue
+
+        # Don't include the SYN packet
+        if 'S' in pkt_data['tcp_flags']:
+            continue
+
+        if pkt_data['relative_timestamp'] < 21.1:
+            continue
+
+        if pkt_data['window'] < 500000:
+            print('Packet ordinal {} has a suspicious TCP window size ({})'.
+                  format(pkt_data['ordinal'], pkt_data['window']))
 {% endhighlight %}
 
 Run:
 ~~~~~~~~~~~~~~~
+vnetman@vnetman-mint:> python3 ./pcap-s.py analyze --in example-01.pickle 
+Packet ordinal 9539 has a suspicious TCP window size (444672)
+vnetman@vnetman-mint:> 
 ~~~~~~~~~~~~~~~
 
-Rem
+Armed with this data, you can now open the capture file in Wireshark and take a closer look at what happened shortly before packet #9539.
 
-##### Step <n>
+Here's a fancier plot, where I am plotting two parameters - the client window size, and the ack number sent by the client (i.e. the number of bytes received thus far from the server):
 
-Rem
+![Analyzing Packet Captures with Python Part 1 Figure 2](/assets/0002.png)
+
+And the `analyze_pickle` code for the above looks like this:
 
 {% highlight python %}
+def analyze_pickle(pickle_file_in):
+    packets_for_analysis = []
+    
+    with open(pickle_file_in, 'rb') as pickle_fd:
+        client_ip_addr_port = pickle.load(pickle_fd)
+        server_ip_addr_port = pickle.load(pickle_fd)
+        packets_for_analysis = pickle.load(pickle_fd)
+
+    # Plot the receive window size and ack number on the client side.
+    client_pkts = []
+    for pkt_data in packets_for_analysis:
+        if pkt_data['direction'] == PktDirection.server_to_client:
+            continue
+
+        # Don't include the SYN packet
+        if 'S' in pkt_data['tcp_flags']:
+            continue
+
+        client_pkts.append({'Time': pkt_data['relative_timestamp'],
+                            'Client window size': pkt_data['window'],
+                            'Client Ack No' : pkt_data['ackno']})
+
+    df = pd.DataFrame(data=client_pkts)
+
+    fig, ax1 = plt.subplots()
+    ax2 = ax1.twinx()
+
+    df.plot(x='Time', y='Client window size', color='r', ax=ax1)
+    df.plot(x='Time', y='Client Ack No', color='b', ax=ax2)
+    
+    ax1.tick_params('y', colors='r')
+    ax2.tick_params('y', colors='b')
+    
+    plt.show()
+    plt.close()
 {% endhighlight %}
 
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
+#### Summary
 
-Rem
+With Python code, you can iterate over the packets in a pcap, extract relevant data, and process that data in ways that make sense to you. You can use code to go over the pcap and locate a specific sequence of packets (i.e. locate the needle in the haystack) for later analysis in a GUI tool like Wireshark. Or you can create customized graphical plots that can help you visualize the packet information. Further, since this is all code, you can do this repeatedly with multiple pcaps.
 
-##### Step <n>
+If you have questions or comments please send them to me by email, and I will be happy to help. My email provider is zoho.com, and my mail id is the name of this blog ("vn...an").
 
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem
-
-##### Step <n>
-
-Rem
-
-{% highlight python %}
-{% endhighlight %}
-
-Run:
-~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~
-
-Rem

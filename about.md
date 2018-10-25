@@ -15,4 +15,6 @@ As a freelancer my most significant project involved refactoring the 'hosts3d' p
 
 I am located in Bangalore (India), UTC+0530.
 
+My email provider is zoho.com, and my mail id is the name of this blog ("vn...an").
+
 [Go to the Home Page]({{ site.url }}{{ site.baseurl }})
