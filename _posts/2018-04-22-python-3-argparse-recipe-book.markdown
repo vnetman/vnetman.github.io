@@ -3,6 +3,8 @@ layout: post
 title:  "Python 3 argparse recipes"
 date:   2018-04-21 19:07:03 +0530
 categories: argparse-recipes
+do_google_analytics_thing: true
+google_analytics_id: UA-128251060-2
 ---
 
 ### About this page
