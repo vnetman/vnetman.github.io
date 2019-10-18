@@ -4,6 +4,8 @@ title:  "Network Automation: A 1000 ft tour"
 tagline: "...in which we look at how to add a VLAN to a switch"
 date:   2019-10-18 19:54:03 +0530
 categories: network-automation netconf yang ansible chef puppet netmiko python
+do_google_analytics_thing: true
+google_analytics_id: UA-128251060-3
 ---
 
 # 1. Who this page is for
@@ -179,7 +181,7 @@ The code above works because the program "knows" that the output of "show vlan b
     17   VLAN0017                         active
 
 
-Note that the code above does the parsing of the output of the show commands manually, i.e. by employing Regular Expressions. Writing Regular Expressions isn't everybody's idea of fun, though, and not necessary either. There are projects like https://github.com/networktocode/ntc-templates whose goal it is to save you the trouble of writing, maintaining and debugging regular expression code for processing the outputs of the most commonly used commands on the most commonly used Network Operating Systems from different manufacturers.
+Note that the code above does the parsing of the output of the show commands manually, i.e. by employing Regular Expressions. Writing Regular Expressions isn't everybody's idea of fun, though, and not necessary either. There are projects like [ntc-templates](https://github.com/networktocode/ntc-templates) whose goal it is to save you the trouble of writing, maintaining and debugging regular expression code for processing the outputs of the most commonly used commands on the most commonly used Network Operating Systems from different manufacturers.
 
 
 Sending a configuration command is equally straightforward with Netmiko. Here's a code fragment that does this:
@@ -236,7 +238,7 @@ The data content accompanying a NETCONF operation follows what is called a YANG 
 
 (If you are familiar with SNMP, at this time you're probably thinking "so a YANG model is like a MIB" - and you'd be right. And NETCONF would be analogous to the underlying SNMP protocol.)
 
-YANG model files are created and published by the IETF, and also by individual equipment manufacturers. As an example, look at https://github.com/YangModels/yang/blob/master/vendor/cisco/xe/1651/Cisco-IOS-XE-ospf.yang. This is the Cisco IOS XE YANG model for OSPF. Running the YANG file through the `pyang` utility provides a tree view of the model. The figure below is a partial, truncated view of this tree:
+YANG model files are created and published by the IETF, and also by individual equipment manufacturers. As an example, look at [the Cisco IOS XE YANG model for OSPF](https://github.com/YangModels/yang/blob/master/vendor/cisco/xe/1651/Cisco-IOS-XE-ospf.yang). Running the YANG file through the `pyang` utility provides a tree view of the model. The figure below is a partial, truncated view of this tree:
 
 
         module: Cisco-IOS-XE-ospf
@@ -365,7 +367,7 @@ The topology of a Chef installation is similar to Model 2 discussed in the "Netw
 
 There are some things to note here:
 
-- The managed nodes run Chef software, called `chef-client`. This fact has an important impact on network devices. It means that Chef can only be used on devices that support an environment where chef-client is explicitly supported. F
+- The managed nodes run Chef software, called `chef-client`. This fact has an important impact on network devices. It means that Chef can only be used on devices that support an environment where chef-client is explicitly supported.
 - Workstations run Chef software (`knife`) to talk to the Chef Server, and also to create _cookbooks_ (more on this a little later, below). In other words, with Chef it is not just a matter of creating some files on the workstation and copying them over to the server by scp or rsync; the workstation is actually performs a functional role in the workflow.
 
 The Chef workflow is like this, at a high level:
@@ -416,8 +418,8 @@ Here is the Chef recipe that applies the configuration needed for our example sc
 
 You will notice code paragraphs beginning with phrases like `cisco_interface` and `cisco_vlan` in the recipe above. In Chef parlance, these are called _resources_. The important point to note here is that these resources come from a `cisco-cookbook` created by Cisco Systems for NXOS devices. You need to install this cookbook in your setup before you are able to write recipes that use these resources. In other words, there is a dependence on vendor-provided software.
 
-https://supermarket.chef.io/cookbooks/cisco-cookbook
-https://github.com/cisco/cisco-network-chef-cookbook/
+[Cisco Cookbook on the Chef Supermarket](https://supermarket.chef.io/cookbooks/cisco-cookbook)
+[Cisco Chef Cookbook on GitHub](https://github.com/cisco/cisco-network-chef-cookbook)
 
 
 ## 6.5 Puppet
@@ -426,7 +428,7 @@ A Network Automation deployment that employs [Puppet](https://puppet.com/) looks
 
 ![Infrastructure for Network Automation - Puppet](/assets/network-automation-setup-puppet.png)
 
-Managed nodes in a Puppet deployment run software called _Puppet Agent_. For this reason, in general only nodes that can explicitly support the Puppet Agent in their environment can be included into a Puppet deployment. (Having said that, Puppet has announced "agent-less" support for some Cisco devices - see here: https://puppet.com/blog/introducing-new-cisco-ios-module-agentless-device-management, but still that is a special case.)
+Managed nodes in a Puppet deployment run software called _Puppet Agent_. For this reason, in general only nodes that can explicitly support the Puppet Agent in their environment can be included into a Puppet deployment. (Having said that, Puppet has announced "agent-less" support for some Cisco devices - [see here](https://puppet.com/blog/introducing-new-cisco-ios-module-agentless-device-management), but still that is a special case.)
 
 Puppet nodes connect to the _Puppet Master_ (using a proprietary protocol) and ask for ("pull") their desired states (i.e. configuration). Upon receipt, the desired state is compared against the actual state of the node, and any changes are applied.
 
