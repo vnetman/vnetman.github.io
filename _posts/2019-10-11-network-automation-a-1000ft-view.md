@@ -10,7 +10,7 @@ google_analytics_id: UA-128251060-3
 
 # 1. Who this page is for
 
-Ansible... Puppet... NETCONF... Yang Models... Python... Jinja templates... NAPALM... Automation ... Infrastructure-As-Code - if you're a Network Engineer, chances are you've heard these terms tossed around in your professional circles over the last few years. And if you're a Network Engineer like the ones I know, you're an expert at configuring network devices and understanding how your network works, but are somewhat at a loss when confronted with these new kids on the block. There's a faint voice at the back of your head telling you that you need to "get into this stuff" - or maybe that faint voice isn't so faint, and may in fact be your boss' voice.
+Ansible... Puppet... NETCONF... Yang Models... Python... Jinja templates... NAPALM... Automation ... Infrastructure-As-Code - if you're a Network Engineer, chances are you've heard these terms tossed around in your professional circles over the last few years. And if you're a Network Engineer like the ones I know, you're an expert at understanding and building networks, but find yourself at a disadvantage when talking about automation. You're a hands-on person and like things explained bottom-up.
 
 If this describes you, this article is for you. 
 
