@@ -2,7 +2,7 @@
 layout: post
 title:  "Network Automation: A 1000 ft tour"
 tagline: "...in which we look at how to add a VLAN to a switch"
-date:   2019-10-18 19:54:03 +0530
+date:   2019-10-26 07:35:03 +0530
 categories: network-automation netconf yang ansible chef puppet netmiko python
 do_google_analytics_thing: true
 google_analytics_id: UA-128251060-3
@@ -585,3 +585,23 @@ What has all this got to do with us? The fact that this notion of "The Repositor
 The fact that device and server configurations now reside in code repositories gives us the opportunity to borrow software engineering practices into IT and network operations. For instance, we could mandate that every commit to the repository (i.e. every change to the infrastructure) must be followed by running an automated test that pings critical devices and verifies the availability of all critical services.
 
 This mindset that looks at device and server configurations (i.e. "infrastructure") as software code is where the term IaS originates.
+
+# Conclusion and next steps
+
+The Network Automation world is constantly evolving, and there are many things that I have not spoken about. I hope, though, that this whirlwind 1000 ft tour gave you the information that you need to get started, and you are now ready to find and take the next step.
+
+The code for automating the example scenario is on [GitHub](https://github.com/vnetman/network-automation-demos).
+
+If you have never worked hands-on on any automation technology before and are itching to get started somewhere, here's what I would recommend:
+
+- make sure you have a network device that you can experiment with
+- install an Ubuntu Linux VM on your laptop (if you don't already have a Linux workstation)
+- follow the instructions to install Netmiko (do a web search)
+- write a small Python program using Netmiko to get/set some basic information on your device
+- then follow the instructions to install Ansible (do a web search)
+- write a small playbook to get/set some basic information on your device
+
+# About Me
+
+Visit [my website](https://vnetman.org)
+
