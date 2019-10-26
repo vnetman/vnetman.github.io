@@ -2,7 +2,7 @@
 layout: post
 title:  "Network Automation: A 1000 ft tour"
 tagline: "...in which we look at how to add a VLAN to a switch"
-date:   2019-10-26 07:35:03 +0530
+date:   2019-10-18 23:00:00 +0530
 categories: network-automation netconf yang ansible chef puppet netmiko python
 do_google_analytics_thing: true
 google_analytics_id: UA-128251060-3
