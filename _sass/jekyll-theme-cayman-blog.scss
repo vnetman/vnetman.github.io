@@ -1,6 +1,7 @@
 @import "normalize";
 @import "rouge-github";
 @import "variables";
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700');
 @import "blog";
 
 @mixin large {
@@ -32,6 +33,24 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: $body-text-color;
+}
+
+#skip-to-content {
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  overflow: hidden;
+  top: -10px;
+
+  &:focus {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    height: auto;
+    width: auto;
+    background: invert($body-link-color);
+    outline: thick solid invert($body-link-color);
+  }
 }
 
 a {
@@ -94,15 +113,15 @@ a {
   background-image: linear-gradient(120deg, $header-bg-color-secondary, $header-bg-color);
 
   @include large {
-    padding: 1rem 1rem;
+    padding: 5rem 6rem;
   }
 
   @include medium {
-    padding: 1rem 1rem;
+    padding: 3rem 4rem;
   }
 
   @include small {
-    padding: 1rem 1rem;
+    padding: 2rem 1rem;
   }
 }
 
@@ -111,15 +130,15 @@ a {
   margin-bottom: 0.1rem;
 
   @include large {
-    font-size: 1.25rem;
+    font-size: 3.25rem;
   }
 
   @include medium {
-    font-size: 1.00rem;
+    font-size: 2.25rem;
   }
 
   @include small {
-    font-size: 0.75rem;
+    font-size: 1.75rem;
   }
 }
 
@@ -129,15 +148,15 @@ a {
   opacity: 0.7;
 
   @include large {
-    font-size: 1.00rem;
+    font-size: 1.25rem;
   }
 
   @include medium {
-    font-size: 0.75rem;
+    font-size: 1.15rem;
   }
 
   @include small {
-    font-size: 0.50rem;
+    font-size: 1rem;
   }
 }
 
@@ -168,7 +187,7 @@ a {
   }
 
   @include large {
-    max-width: 80rem;
+    max-width: 64rem;
     padding: 3rem 6rem;
     margin: 0 auto;
     font-size: 1.1rem;
@@ -182,6 +201,26 @@ a {
   @include small {
     padding: 2rem 1rem;
     font-size: 1rem;
+
+    ul,
+    ol {
+      margin-top: 0;
+      padding-left: 0;
+    }    
+  }
+
+  kbd {
+    background-color: #fafbfc;
+    border: 1px solid #c6cbd1;
+    border-bottom-color: #959da5;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #959da5;
+    color: #444d56;
+    display: inline-block;
+    font-size: 11px;
+    line-height: 10px;
+    padding: 3px 5px;
+    vertical-align: middle;
   }
 
   img {
