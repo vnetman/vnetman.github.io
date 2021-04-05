@@ -601,7 +601,3 @@ If you have never worked hands-on on any automation technology before and are it
 - then follow the instructions to install Ansible (do a web search)
 - write a small playbook to get/set some basic information on your device
 
-# About Me
-
-Visit [my website](https://vnetman.org)
-
