@@ -936,6 +936,3 @@ def analyze_pickle(pickle_file_in):
 #### Summary
 
 With Python code, you can iterate over the packets in a pcap, extract relevant data, and process that data in ways that make sense to you. You can use code to go over the pcap and locate a specific sequence of packets (i.e. locate the needle in the haystack) for later analysis in a GUI tool like Wireshark. Or you can create customized graphical plots that can help you visualize the packet information. Further, since this is all code, you can do this repeatedly with multiple pcaps.
-
-If you have questions or comments please send them to me by email, and I will be happy to help. My email provider is zoho.com, and my mail id is the name of this blog ("vn...an").
-
